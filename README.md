@@ -1,14 +1,16 @@
-### BERT domain-specific training scripts
+### BERT domain-specific training scripts for use with Multi-label classification
 
-Scripts to further pretrain pretrained bert models on more data, and then to finetune on a task. Also includes evaluation scripts and counting scripts, but some are currently hardcoded for the ESS and Tayide datasets.
+Scripts to further pretrain pretrained bert models on more data, and then to finetune on a multi-label classification task. Also includes evaluation scripts and counting scripts, but some are currently hardcoded for the ESS and Tayide datasets.
 
 In order to use this, the following should also be installed:
 - the official bert repository: https://github.com/google-research/bert
-- a pretrained bert-base model; for example, BlueBERT-Base, Uncased, PubMed+MIMIC-III
+- a pretrained bert-base model; for example, "BlueBERT-Base, Uncased, PubMed+MIMIC-III" from https://github.com/ncbi-nlp/bluebert
 
-For the MSc work, 2 environments were used:
+#### Environments
 
-for pretraning, with the following installed:
+For the MSc work, 2 environments were used.
+
+The pretraining env included:
 - python                    3.6.10  
 - bert-tensorflow           1.0.1  
 - tensorflow                1.11.0        
@@ -17,7 +19,7 @@ for pretraning, with the following installed:
 - lxml                      4.5.1 (for creating tsv files)
 - nltk                      3.5 (if counting tokens)
 
-for converting the tensorflow model to pytorch, and fine-tuning:
+The finetuning environment, also used for converting the tensorflow model to pytorch included:
 - python                    3.6.10 
 - tensorflow              2.2.0
 - transformers            3.0.1
