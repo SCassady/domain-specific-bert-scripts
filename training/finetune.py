@@ -30,84 +30,46 @@ from pytorch_pretrained_bert.optimization import BertAdam
 import logging
 from tqdm import tqdm_notebook as tqdm
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
-                    datefmt='%m/%d/%Y %H:%M:%S',
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# arguments:
-# ESS_DATA_PATH:
-# ESS_BERT_PRETRAINED_PATH:
-# ESS_OUTPUT_PATH:
-# PYTORCH_PRETRAINED_BERT_CACHE:
 
 
-ESS_DATA_PATH = sys.argv[1]
-ESS_BERT_PRETRAINED_PATH = sys.argv[2]
-ESS_OUTPUT_PATH = sys.argv[3]
-PYTORCH_PRETRAINED_BERT_CACHE = sys.argv[3]
+'''
+Note: if predicting, then change the "label_cols" variable below to reflect the column labels for the multilabels used.
 
+------ arguments --------
+1.) DATA_PATH: path to directory containing train/eval/test data. Data files would be: train.tsv, dev.tsv, test.tsv.
+2.) BERT_PRETRAINED_PATH: path to directory containing prerained pytorch model, as well as vocab file and bert config:
+  Should contain: bert_config.json  pytorch_model.bin  vocab.txt
+3.) OUTPUT_PATH: path to directory where results and resutling model outputted.
+4.) NUM_EPOCHS: number of finetuning epochs.
+5.) LEARNING_RATE: learning rate, can be specified as "7e-5", etc.
+6.) SEED: random seed, an int.
+7.) EVAL: perform evaluation? 1 = true, 0 = false. Requires dev.csv in data folder.
+8.) PREDICT: predict on test data? 1 = true, 0 = false. Requires test.csv in data folder.
+'''
 
+DATA_PATH = sys.argv[1]
+BERT_PRETRAINED_PATH = sys.argv[2]
+OUTPUT_PATH = sys.argv[3]
 NUM_EPOCHS = int(sys.argv[4])
 LEARNING_RATE = np.float32(sys.argv[5])
 SEED = int(sys.argv[6])
 EVAL = bool(int(sys.argv[7]))
 PREDICT = bool(int(sys.argv[8]))
-METRICS_FILE = str(ESS_OUTPUT_PATH) + "_metrics.tsv"
 
-
-print("ESS_DATA_PATH", ESS_DATA_PATH)
-print("ESS_BERT_PRETRAINED_PATH", ESS_BERT_PRETRAINED_PATH)
-print("ESS_OUTPUT_PATH", ESS_OUTPUT_PATH)
-print("PYTORCH_PRETRAINED_BERT_CACHE", PYTORCH_PRETRAINED_BERT_CACHE)
-print("NUM_EPOCHS", NUM_EPOCHS)
-print("LEARNING_RATE", LEARNING_RATE)
-print("SEED", SEED)
-print("EVAL", EVAL)
-print("PREDICT", PREDICT)
-print("METRICS_FILE", METRICS_FILE)
-
-# DATA_PATH=Path('../data/toxic_comments/')
-# DATA_PATH.mkdir(exist_ok=True)
-#
-# PATH=Path('../data/toxic_comments/tmp')
-# PATH.mkdir(exist_ok=True)
-#
-# CLAS_DATA_PATH=PATH/'class'
-# CLAS_DATA_PATH.mkdir(exist_ok=True)
-
+METRICS_FILE = str(OUTPUT_PATH) + "_metrics.tsv"
+PYTORCH_PRETRAINED_BERT_CACHE = sys.argv[3] # the resulting model to be stored with output
 model_state_dict = None
-
-# # BERT_PRETRAINED_PATH = Path('../trained_model/')
-# BERT_PRETRAINED_PATH = Path('../../complaints/bert/pretrained-weights/uncased_L-12_H-768_A-12/')
-# # BERT_PRETRAINED_PATH = Path('../../complaints/bert/pretrained-weights/cased_L-12_H-768_A-12/')
-# # BERT_PRETRAINED_PATH = Path('../../complaints/bert/pretrained-weights/uncased_L-24_H-1024_A-16/')
-
-
-# BERT_FINETUNED_WEIGHTS = Path('../trained_model/toxic_comments')
-
-# PYTORCH_PRETRAINED_BERT_CACHE = BERT_PRETRAINED_PATH/'cache/'
-# PYTORCH_PRETRAINED_BERT_CACHE.mkdir(exist_ok=True)
-
-# output_model_file = os.path.join(BERT_FINETUNED_WEIGHTS, "pytorch_model.bin")
-
-# Load a trained model that you have fine-tuned
-# model_state_dict = torch.load(output_model_file)
-
 
 # ## Model Parameters
 args = {
     "train_size": -1,
     "val_size": -1,
-    # "full_data_dir": DATA_PATH,
-    # "data_dir": PATH,
-    "full_data_dir": ESS_DATA_PATH,
-    "data_dir": ESS_DATA_PATH,
+    "full_data_dir": DATA_PATH,
+    "data_dir": DATA_PATH,
     "task_name": "ess",
     "no_cuda": False,
-    "bert_model": ESS_BERT_PRETRAINED_PATH,
-    # "output_dir": CLAS_DATA_PATH/'output',
-    "output_dir": ESS_OUTPUT_PATH,
+    "bert_model": BERT_PRETRAINED_PATH,
+    "output_dir": OUTPUT_PATH,
     "max_seq_length": 512,
     "do_train": True,
     "do_eval": True,
@@ -115,17 +77,47 @@ args = {
     "train_batch_size": 8,
     "eval_batch_size": 8,
     "learning_rate": LEARNING_RATE,
-    # "learning_rate": 3e-5,
     "num_train_epochs": int(NUM_EPOCHS),
     "warmup_proportion": 0.1,
     "local_rank": -1,
     "seed": SEED,
-    # "seed": 42,
     "gradient_accumulation_steps": 1,
     "optimize_on_cpu": False,
     "fp16": False,
     "loss_scale": 128
 }
+
+label_cols = ["id",
+                 "Ischaemic stroke, deep, recent",
+                "Ischaemic stroke, deep, old",
+                "Ischaemic stroke, cortical, recent",
+                "Ischaemic stroke, cortical, old",
+                "Ischaemic stroke, underspecified",
+                "Haemorrhagic stroke, deep, recent",
+                "Haemorrhagic stroke, deep, old",
+                "Haemorrhagic stroke, lobar, recent",
+                "Haemorrhagic stroke, lobar, old",
+                "Haemorrhagic stroke, underspecified",
+                "Stroke, underspecified",
+                "Tumour, meningioma",
+                "Tumour, metastasis",
+                "Tumour, glioma",
+                "Tumour, other",
+                "Small vessel disease",
+                "Atrophy",
+                "Subdural haematoma",
+                "Subarachnoid haemorrhage, aneurysmal",
+                "Subarachnoid haemorrhage, other",
+                "Microbleed, deep",
+                "Microbleed, lobar",
+                "Microbleed, underspecified",
+                "Haemorrhagic transformation"]
+
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
+                    datefmt='%m/%d/%Y %H:%M:%S',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 # ###  Model Class
@@ -753,7 +745,6 @@ def predict(model, path, predict_processor, test_filename='test.tsv'):
                     right_index=True)
 
 
-
 # ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #                                                 MAIN
 # ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -764,9 +755,7 @@ processors = {
     "ess": ESSProcessor
 }
 
-
 # Setup GPU parameters
-
 if args["local_rank"] == -1 or args["no_cuda"]:
     device = torch.device("cuda" if torch.cuda.is_available() and not args["no_cuda"] else "cpu")
     n_gpu = torch.cuda.device_count()
@@ -805,10 +794,8 @@ train_examples = None
 num_train_steps = None
 if args['do_train']:
     train_examples = processor.get_train_examples(args['full_data_dir'], size=args['train_size'])
-#     train_examples = processor.get_train_examples(args['data_dir'], size=args['train_size'])
     num_train_steps = math.ceil(
         len(train_examples) / args['train_batch_size'] / args['gradient_accumulation_steps'] * args['num_train_epochs'])
-
 
 model = get_model()
 
@@ -817,15 +804,8 @@ if args['fp16']:
 model.to(device)
 if args['local_rank'] != -1:
     print("oops")
-    # try:
-    #     # from apex.parallel import DistributedDataParallel as DDP
-    # except ImportError:
-    #     raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
-
-    # model = DDP(model)
 elif n_gpu > 1:
     model = torch.nn.DataParallel(model)
-
 
 # Prepare optimizer
 param_optimizer = list(model.named_parameters())
@@ -839,34 +819,11 @@ if args['local_rank'] != -1:
     t_total = t_total // torch.distributed.get_world_size()
 if args['fp16']:
     print("oops")
-    # try:
-    #     # from apex.optimizers import FP16_Optimizer
-    #     # from apex.optimizers import FusedAdam
-    # except ImportError:
-    #     raise ImportError("Please install apex from https://www.github.com/nvidia/apex to use distributed and fp16 training.")
-
-    # optimizer = FusedAdam(optimizer_grouped_parameters,
-    #                       lr=args['learning_rate'],
-    #                       bias_correction=False,
-    #                       max_grad_norm=1.0)
-    # if args['loss_scale'] == 0:
-    #     optimizer = FP16_Optimizer(optimizer, dynamic_loss_scale=True)
-    # else:
-    #     optimizer = FP16_Optimizer(optimizer, static_loss_scale=args['loss_scale'])
-
 else:
-    # optimizer = AdamW(optimizer_grouped_parameters,
-    #                         lr=args['learning_rate'],
-    #                         correct_bias=False)
     optimizer = BertAdam(optimizer_grouped_parameters,
                          lr=args['learning_rate'],
                          warmup=args['warmup_proportion'],
                          t_total=t_total)
-    # scheduler = get_linear_schedule_with_warmup(optimizer, )
-
-
-# scheduler = CyclicLR(optimizer, base_lr=2e-5, max_lr=5e-5, step_size=2500, last_batch_iteration=0)
-
 
 # Eval Fn
 if EVAL:
@@ -923,46 +880,21 @@ model.to(device)
 print("model", model)
 
 # ---------------------------   EVAL    ----------------------------
-# ### Model Evaluation
+## Model Evaluation
 if EVAL:
     eval()
 
 # ---------------------------   PREDICT    ----------------------------
 
 if PREDICT:
-    result = predict(model, ESS_DATA_PATH, processor)
+    result = predict(model, DATA_PATH, processor)
     print("result.shape: ", result.shape)
 
-    ess_cols = ["id",
-                 "Ischaemic stroke, deep, recent",
-                "Ischaemic stroke, deep, old",
-                "Ischaemic stroke, cortical, recent",
-                "Ischaemic stroke, cortical, old",
-                "Ischaemic stroke, underspecified",
-                "Haemorrhagic stroke, deep, recent",
-                "Haemorrhagic stroke, deep, old",
-                "Haemorrhagic stroke, lobar, recent",
-                "Haemorrhagic stroke, lobar, old",
-                "Haemorrhagic stroke, underspecified",
-                "Stroke, underspecified",
-                "Tumour, meningioma",
-                "Tumour, metastasis",
-                "Tumour, glioma",
-                "Tumour, other",
-                "Small vessel disease",
-                "Atrophy",
-                "Subdural haematoma",
-                "Subarachnoid haemorrhage, aneurysmal",
-                "Subarachnoid haemorrhage, other",
-                "Microbleed, deep",
-                "Microbleed, lobar",
-                "Microbleed, underspecified",
-                "Haemorrhagic transformation"]
+    output_tsv = os.path.join(OUTPUT_PATH, "pred.tsv")
+    result[label_cols].to_csv(output_tsv, index=None, sep='\t')
 
-    output_csv = os.path.join(ESS_OUTPUT_PATH, "pred.csv")
-    output_tsv = os.path.join(ESS_OUTPUT_PATH, "pred.tsv")
-
-    result[ess_cols].to_csv(output_csv, index=None)
-    result[ess_cols].to_csv(output_tsv, index=None, sep='\t')
+    ## Uncomment to output csv.
+    # output_csv = os.path.join(OUTPUT_PATH, "pred.csv")
+    # result[label_cols].to_csv(output_csv, index=None)
 
     print(">>>>>>>>>>>> prediction made")

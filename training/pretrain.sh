@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+
 # Further pretrains existing BERT models. In this case, Bert-BASE was used.
 # It should be okay using BERT's vocab file, even though I used NCBI's here (there may not be a difference).
+
+# create_pretraining_data.py and run_pretraining.py from https://github.com/google-research/bert
+
+# Replace input_file, output_file, output_dir, etc. values
 
 # Takes a single argument:
 # Output directory

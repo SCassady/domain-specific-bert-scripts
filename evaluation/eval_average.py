@@ -8,14 +8,17 @@ import statistics
 from sklearn.metrics import roc_auc_score
 import copy
 
-# Calculate Precision, Recall, F1 scores for each label, as well micro and macro values.
-# This is meant to be used with several different seeds, calculating means and variance for the values.
+'''
+Calculate Precision, Recall, F1 scores for each label, as well micro and macro values.
+This is meant to be used with several different seeds, calculating means and variance for the values.
+It is somewhat hardcoded to work with the ESS and Tayside data sets.
 
-# Read arguments:
-# GOLD_PATH: gold .csv file.
-# PRED_DIRECTORY: directory containing the .csv files for each seed.
-# OUTPUT_PATH: output file name.
-# DATA_SET: (string) 'ess' or 'tay', which specifies the data set used.
+Arguments:
+1.) GOLD_PATH: gold .csv file.
+2.) PRED_DIRECTORY: directory containing the .csv files for each seed.
+3.) OUTPUT_PATH: output file name.
+4.) DATA_SET: (string) 'ess' or 'tay', which specifies the data set used.
+'''
 
 print("-------------------------  reading args...  --------------------------")
 GOLD_PATH = sys.argv[1]

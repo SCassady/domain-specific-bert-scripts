@@ -10,10 +10,6 @@ tensorflow-gpu            1.11.0               h0d30ee6_0    anaconda
 lxml                      4.5.1 (for creating tsv files)
 nltk                      3.5 (if counting tokens)
 
-
-
-
-
 conda list output:
 _libgcc_mutex             0.1                        main
 _tflow_select             2.1.0                       gpu    anaconda

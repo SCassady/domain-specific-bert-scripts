@@ -1,6 +1,7 @@
 #!/bin/sh
 #!/usr/bin/env bash
 
+# Example of shell script for finetuning.
 # Used for fine-tuning N seeds. (ie; written here is seeds 41 to 50).
 
 # pretraining model locations:
@@ -11,14 +12,15 @@ EPOCHS=25
 LEARNING_RATE=7e-5
 
 # finetune.py args:
-# 1) finetuning input data (folder with train, dev, test .tsv)
-# 2) pretrained pytorch model
-# 3) output folder
-# 4) number of epochs
-# 5) learning rate
-# 6) random seed
-# 7) do evaluation?
-# 8) do prediction?
+#1.) DATA_PATH: path to directory containing train/eval/test data. Data files would be: train.tsv, dev.tsv, test.tsv.
+#2.) BERT_PRETRAINED_PATH: path to directory containing prerained pytorch model, as well as vocab file and bert config:
+#  Should contain: bert_config.json  pytorch_model.bin  vocab.txt
+#3.) OUTPUT_PATH: path to directory where results and resutling model outputted.
+#4.) NUM_EPOCHS: number of finetuning epochs.
+#5.) LEARNING_RATE: learning rate, can be specified as "7e-5", etc.
+#6.) SEED: random seed, an int.
+#7.) EVAL: perform evaluation? 1 = true, 0 = false. Requires dev.csv in data folder.
+#8.) PREDICT: predict on test data? 1 = true, 0 = false. Requires test.csv in data folder.
 
 TSV_PATH="/disk/data2/radiology/users/scassady/data/finetuning/over_extreme/"
 OUTPUT_PATH="/disk/data2/radiology/users/scassady/data/finetuning_output/merge/ess/bert/"
